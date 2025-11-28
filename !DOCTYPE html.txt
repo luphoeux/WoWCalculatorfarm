@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Farmer de WoW</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter Only -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wow: {
+                            dark: '#0e1015',
+                            card: '#15171e',
+                            border: '#2a2e3b',
+                            gold: '#fbbf24',
+                            rare: '#3b82f6',
+                            epic: '#a335ee',
+                            legendary: '#ff8000',
+                            danger: '#ef4444',
+                            success: '#22c55e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'], // Default font for everything
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at top, #1a1d26 0%, #050505 100%);
+        }
+        
+        .input-wrapper {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .input-wrapper:focus-within {
+            transform: translateY(-1px);
+        }
+        
+        .input-wrapper:focus-within i {
+            color: #fbbf24;
+        }
+        
+        .input-wrapper:focus-within input {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 1px #fbbf2433;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e1015;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2e3b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f4455;
+        }
+        
+        /* Pulse animation for Sync Button */
+        @keyframes spin-once {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+        .clicked-spin {
+            animation: spin-once 0.5s ease-out;
+        }
+
+        /* Fade in animation for results */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-300 font-sans p-4 md:p-8 flex flex-col items-center transition-all duration-700">
+
+    <!-- HEADER GLOBAL -->
+    <div class="mb-8 text-center transition-all duration-700" id="mainHeader">
+        <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
+            <i class="fas fa-coins mr-2 text-wow-gold"></i>Calculadora Farmer de <span class="text-wow-gold">WoW</span>
+        </h1>
+        <p class="text-gray-500 text-sm">Planifica tu economía para la próxima expansión.</p>
+    </div>
+
+    <!-- MAIN GRID CONTAINER (Starts Centered) -->
+    <div id="mainGrid" class="w-full max-w-md mx-auto transition-all duration-700 ease-in-out">
+        
+        <!-- SECTION: INPUTS (Left Column) -->
+        <div id="inputCol" class="w-full space-y-6 transition-all duration-700">
+            
+            <!-- Unified Configuration Card -->
+            <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-lg">
+                
+                <!-- 1. MERCADO SECTION -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400"><i class="fas fa-globe-americas mr-2"></i>Mercado (NA)</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Costo Expansión -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">COSTO EXPANSIÓN (USD)</label>
+                            <div class="flex gap-2">
+                                <div class="input-wrapper relative flex-grow">
+                                    <i class="fas fa-dollar-sign absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
+                                    <input type="text" inputmode="decimal" id="usdCost" 
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-3 text-white font-medium focus:outline-none placeholder-gray-700" 
+                                        value="90" placeholder="0" oninput="calculate()">
+                                </div>
+                                <!-- Token Counter Display -->
+                                <div class="w-20 flex-shrink-0 bg-[#0a0b10] border border-wow-border rounded-lg flex flex-col justify-center items-center shadow-inner">
+                                    <span id="inputTokensDisplay" class="text-blue-400 font-bold text-lg leading-none mt-1">6</span>
+                                    <span class="text-[9px] text-gray-600 uppercase font-bold mb-0.5">Fichas</span>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-gray-500 mt-2 ml-1 flex items-start gap-1.5 leading-tight">
+                                <i class="fas fa-info-circle mt-0.5 text-blue-500/50 flex-shrink-0"></i> 
+                                <span>
+                                    <strong>Nota:</strong> La ficha otorga $15 de saldo al canjearla por oro.
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="border-t border-wow-border"></div>
+
+                        <!-- Precio Ficha (TRIGGER PRINCIPAL) -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1.5 ml-1">
+                                <label class="block text-xs font-semibold text-gray-500">PRECIO FICHA (ORO)</label>
+                                <!-- Link de redirección -->
+                                <a href="https://wowauction.us/token" target="_blank" class="text-[10px] text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                                    <span>Ver precio en WoWAuction</span>
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                            <div class="input-wrapper relative">
+                                <i class="fas fa-coins absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
+                                <!-- Updated oninput to use handleTokenInput -->
+                                <input type="text" inputmode="decimal" id="tokenPrice" 
+                                    class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-3 text-white font-medium focus:outline-none placeholder-gray-600 transition-colors duration-300" 
+                                    value="" placeholder="Ingresa el precio..." 
+                                    oninput="handleTokenInput(this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DIVIDER -->
+                <div class="border-t border-wow-border mb-6"></div>
+
+                <!-- 2. PROGRESO SECTION -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400"><i class="fas fa-user-astronaut mr-2"></i>Tu Progreso</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">ORO ACTUAL</label>
+                            <div class="input-wrapper relative">
+                                <i class="fas fa-sack-dollar absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
+                                <input type="text" inputmode="decimal" id="currentGold" 
+                                    class="w-full bg-[#0a0b10] border border-green-900/30 rounded-lg py-2.5 pl-10 pr-3 text-green-400 font-bold focus:outline-none placeholder-gray-800 border-wow-border" 
+                                    value="0" placeholder="0" oninput="calculate()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-end mb-1.5 ml-1">
+                                <label class="block text-xs font-semibold text-gray-500">FARM DIARIO PROMEDIO</label>
+                                <span id="autoModeLabel" class="text-[9px] text-blue-400 transition-opacity duration-300 flex items-center gap-1 opacity-0">
+                                    <i class="fas fa-robot"></i> Auto-ajustado
+                                </span>
+                            </div>
+                            <div class="input-wrapper relative">
+                                <i class="fas fa-hammer absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
+                                
+                                <input type="text" inputmode="decimal" id="dailyFarm" 
+                                    class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-10 text-yellow-400 font-bold focus:outline-none placeholder-gray-800 transition-colors duration-300" 
+                                    value="0" placeholder="0" 
+                                    oninput="this.value = this.value.replace(/[^0-9.,]/g, ''); handleDailyInput()">
+                                
+                                <button id="syncBtn" onclick="enableAutoDaily()" 
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-300 hidden transition-colors" 
+                                    title="Volver a calcular automáticamente (Mínimo 15k)">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <!-- Efficiency Advice -->
+                            <div id="efficiencyWarning" class="hidden mt-1.5 ml-1 text-[10px] text-gray-500 flex items-center gap-1.5 opacity-80">
+                                <i class="fas fa-info-circle text-blue-400"></i> 
+                                <span>Consejo: El farm mínimo por hora es 15,000</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">FECHA LÍMITE</label>
+                            <div class="input-wrapper relative">
+                                <input type="date" id="deadlineDate" 
+                                    class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 px-3 text-gray-300 focus:outline-none [color-scheme:dark] transition-colors duration-300" 
+                                    onchange="calculate()">
+                            </div>
+                            
+                            <!-- Event Presets with Tooltips -->
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <!-- Brutosaur Button -->
+                                <button id="btnBrutosaurio" onclick="setDeadline('2026-01-05')" 
+                                    class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
+                                    <i class="fas fa-dragon mr-1.5"></i>Brutosaurio
+                                    <div class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
+                                        <div class="font-bold text-wow-gold mb-0.5">05 de Enero 2026</div>
+                                        Límite para comprar el Brutosaurio.
+                                    </div>
+                                </button>
+
+                                <!-- Midnight Button -->
+                                <button id="btnMidnight" onclick="setDeadline('2026-03-02')" 
+                                    class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
+                                    <i class="fas fa-moon mr-1.5"></i>Midnight
+                                    <div class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
+                                        <div class="font-bold text-purple-400 mb-0.5">02 de Marzo 2026</div>
+                                        Sale la expansión WoW Midnight.
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Button Container -->
+            <div id="resetContainer" class="w-full text-center hidden pt-2 opacity-0 transition-opacity duration-500">
+                <button onclick="resetForm()" class="text-xs text-gray-500 hover:text-gray-300 underline transition-colors focus:outline-none">
+                    <i class="fas fa-undo mr-1"></i> Restablecer
+                </button>
+            </div>
+
+        </div>
+
+        <!-- SECTION: RESULTS (Right Column) - Hidden by default -->
+        <div id="resultsSection" class="lg:col-span-7 space-y-6 hidden opacity-0 transition-opacity duration-700">
+            
+            <!-- Main Status Card -->
+            <div class="bg-gradient-to-br from-[#1c1f2b] to-[#15171e] border border-wow-border rounded-xl p-6 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all"></div>
+                
+                <div class="grid grid-cols-2 gap-8 relative z-10">
+                    <div>
+                        <div class="text-gray-500 text-xs uppercase font-bold mb-1">Costo Total</div>
+                        <div class="text-2xl font-bold text-white flex items-baseline gap-2">
+                            <span id="totalGoldNeeded">0</span>
+                            <!-- WoW Coin Icon -->
+                            <img src="https://wow.zamimg.com/images/wow/icons/small/inv_misc_coin_01.jpg" alt="Gold" class="w-4 h-4 rounded-full mt-1.5 shadow-sm">
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">Equivale a <span id="tokensNeeded" class="text-blue-400 font-bold">0</span> Fichas</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-gray-500 text-xs uppercase font-bold mb-1">Oro Faltante</div>
+                        <div class="text-3xl font-bold text-wow-danger flex items-baseline justify-end gap-2">
+                            <span id="missingGold">0</span>
+                            <!-- WoW Coin Icon -->
+                            <img src="https://wow.zamimg.com/images/wow/icons/small/inv_misc_coin_01.jpg" alt="Gold" class="w-5 h-5 rounded-full mb-1 shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mt-6 relative z-10">
+                    <div class="flex justify-between text-xs mb-1.5 text-gray-400">
+                        <span>Progreso Actual</span>
+                        <span id="progressText">0%</span>
+                    </div>
+                    <div class="w-full bg-[#0a0b10] rounded-full h-2.5 overflow-hidden">
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-blue-400 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Card: Strict Requirement -->
+                <div id="strictCard" class="bg-wow-card border border-l-4 border-l-wow-gold border-y-wow-border border-r-wow-border rounded-r-xl rounded-l-sm p-5 shadow-lg flex flex-col justify-between transition-colors duration-300">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <div id="strictIconBox" class="p-1.5 bg-yellow-900/20 rounded text-yellow-500 transition-colors duration-300"><i class="fas fa-hourglass-half text-sm"></i></div>
+                            <h3 class="font-bold text-gray-200 text-sm">Meta Estricta</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Para llegar exactamente el <span id="targetDateDisplay" class="text-gray-300">...</span></p>
+                    </div>
+                    
+                    <div>
+                        <div class="text-xs text-yellow-500 font-medium mb-1" id="strictLabel">Oro diario necesario</div>
+                        <div class="text-2xl font-bold text-white" id="dailyNeededStrict">0</div>
+                        
+                        <div class="mt-3 pt-3 border-t border-wow-border text-xs text-gray-500 text-right">
+                            <span id="daysRemainingText">0</span> días restantes
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Real Projection -->
+                <div id="projectionCard" class="bg-wow-card border border-l-4 border-l-wow-gold border-y-wow-border border-r-wow-border rounded-r-xl rounded-l-sm p-5 shadow-lg flex flex-col justify-between transition-colors duration-300">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <div id="projectionIconBox" class="p-1.5 bg-yellow-900/20 rounded text-yellow-500 transition-colors duration-300"><i class="fas fa-calendar-check text-sm"></i></div>
+                            <h3 class="font-bold text-gray-200 text-sm">Proyección Real</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Basado en tu farm actual</p>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-yellow-500 font-medium mb-1" id="projectionLabel">Fecha estimada de compra</div>
+                        <div class="text-2xl font-bold text-white" id="estimatedDate">--/--/--</div>
+
+                        <div class="mt-3 pt-3 border-t border-wow-border flex justify-between items-center">
+                            <div class="text-xs text-gray-500">
+                                <span id="realDaysNeeded" class="text-gray-300 font-bold">0</span> días de farmeo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descriptive Text Container (IMPOSING VERSION) -->
+            <div id="tipContainer" class="bg-gradient-to-r from-blue-900/40 to-blue-900/10 border-l-4 border-blue-500 shadow-lg shadow-blue-900/20 rounded-r-lg p-6 flex gap-4 items-start transition-all duration-300">
+                <i class="fas fa-lightbulb text-blue-400 mt-1 text-xl" id="tipIcon"></i>
+                <div class="text-base text-gray-300 leading-relaxed w-full" id="tipText">
+                    <!-- Text will be injected by JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Set default date to Jan 5, 2026
+        document.getElementById('deadlineDate').value = "2026-01-05";
+
+        // Global State
+        let manualDaily = false;
+
+        // Constants for Dates
+        const DATE_BRUTO = '2026-01-05';
+        const DATE_MIDNIGHT = '2026-03-02';
+
+        function setDeadline(dateStr) {
+            const input = document.getElementById('deadlineDate');
+            input.value = dateStr;
+            calculate(); 
+            
+            input.classList.add('bg-blue-900/40', 'border-blue-500');
+            setTimeout(() => {
+                input.classList.remove('bg-blue-900/40', 'border-blue-500');
+            }, 300);
+        }
+
+        // Helper to update button visuals based on current date
+        function updateButtonStates(currentDate) {
+            const btnBruto = document.getElementById('btnBrutosaurio');
+            const btnMid = document.getElementById('btnMidnight');
+
+            const brutoActive = ['bg-yellow-900/40', 'border-yellow-500', 'text-yellow-200', 'shadow-[0_0_10px_rgba(234,179,8,0.2)]'];
+            const brutoInactive = ['bg-[#2a220e]', 'border-yellow-900/30', 'text-wow-gold/60', 'hover:text-wow-gold', 'hover:border-yellow-900/60'];
+
+            const midActive = ['bg-purple-900/40', 'border-purple-500', 'text-purple-200', 'shadow-[0_0_10px_rgba(168,85,247,0.2)]'];
+            const midInactive = ['bg-[#181226]', 'border-purple-900/30', 'text-purple-400/60', 'hover:text-purple-400', 'hover:border-purple-900/60'];
+
+            btnBruto.classList.remove(...brutoActive, ...brutoInactive);
+            btnMid.classList.remove(...midActive, ...midInactive);
+
+            if (currentDate === DATE_BRUTO) {
+                btnBruto.classList.add(...brutoActive);
+                btnMid.classList.add(...midInactive);
+            } else if (currentDate === DATE_MIDNIGHT) {
+                btnBruto.classList.add(...brutoInactive);
+                btnMid.classList.add(...midActive);
+            } else {
+                btnBruto.classList.add(...brutoInactive);
+                btnMid.classList.add(...midInactive);
+            }
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('es-ES').format(Math.round(num));
+        }
+
+        function getCleanGold(id) {
+            let val = document.getElementById(id).value;
+            if (typeof val === 'string') {
+                val = val.replace(/[.,\s]/g, ''); 
+            }
+            return parseInt(val) || 0;
+        }
+
+        function getCleanMoney(id) {
+            let val = document.getElementById(id).value;
+            if (typeof val === 'string') {
+                val = val.replace(/[, ]/g, ''); 
+                val = val.replace(',', '.'); 
+            }
+            return parseFloat(val) || 0;
+        }
+
+        // Validates token price max limit
+        function handleTokenInput(input) {
+            let val = input.value.replace(/[^0-9.,]/g, '');
+            let rawStr = val.replace(/[.,]/g, '');
+            let raw = parseInt(rawStr);
+
+            if (raw > 1000000) {
+                input.value = "1000000"; 
+                input.classList.add('text-red-500');
+                setTimeout(() => {
+                    input.classList.remove('text-red-500');
+                }, 300);
+            } else {
+                input.value = val;
+            }
+            
+            calculate();
+        }
+
+        function handleDailyInput() {
+            manualDaily = true;
+            document.getElementById('syncBtn').classList.remove('hidden');
+            document.getElementById('autoModeLabel').classList.add('opacity-0');
+            calculate();
+        }
+
+        function enableAutoDaily() {
+            manualDaily = false;
+            document.getElementById('syncBtn').classList.add('clicked-spin'); 
+            setTimeout(() => document.getElementById('syncBtn').classList.remove('clicked-spin'), 500);
+            
+            document.getElementById('syncBtn').classList.add('hidden');
+            document.getElementById('autoModeLabel').classList.remove('opacity-0');
+            calculate();
+        }
+
+        function resetForm() {
+            document.getElementById('tokenPrice').value = "";
+            document.getElementById('currentGold').value = "0";
+            document.getElementById('dailyFarm').value = "0";
+            document.getElementById('usdCost').value = "90";
+            document.getElementById('deadlineDate').value = "2026-01-05";
+            
+            manualDaily = false;
+            document.getElementById('syncBtn').classList.add('hidden');
+            document.getElementById('autoModeLabel').classList.add('opacity-0'); 
+
+            calculate();
+        }
+
+        function setCardStatus(cardId, iconBoxId, labelId, status) {
+            const card = document.getElementById(cardId);
+            const iconBox = document.getElementById(iconBoxId);
+            const label = document.getElementById(labelId);
+            
+            const colors = {
+                default: { border: 'border-l-wow-gold', iconBg: 'bg-yellow-900/20', iconText: 'text-yellow-500', label: 'text-yellow-500' },
+                danger: { border: 'border-l-wow-danger', iconBg: 'bg-red-900/20', iconText: 'text-red-500', label: 'text-red-400' },
+                success: { border: 'border-l-wow-success', iconBg: 'bg-green-900/20', iconText: 'text-green-500', label: 'text-green-400' }
+            };
+
+            card.classList.remove('border-l-wow-gold', 'border-l-wow-danger', 'border-l-wow-success');
+            iconBox.className = 'p-1.5 rounded transition-colors duration-300';
+            label.className = 'text-xs font-medium mb-1 transition-colors duration-300';
+
+            const theme = colors[status];
+            card.classList.add(theme.border);
+            iconBox.classList.add(theme.iconBg, theme.iconText);
+            label.classList.add(theme.label);
+        }
+
+        function calculate() {
+            const tokenPrice = getCleanGold('tokenPrice');
+            const currentGold = getCleanGold('currentGold');
+            const costInput = getCleanMoney('usdCost'); 
+            const deadlineVal = document.getElementById('deadlineDate').value;
+            
+            const resultsSection = document.getElementById('resultsSection');
+            const mainGrid = document.getElementById('mainGrid');
+            const inputCol = document.getElementById('inputCol');
+            const resetContainer = document.getElementById('resetContainer');
+
+            // --- LAYOUT DYNAMIC TRANSITION ---
+            if (tokenPrice <= 0) {
+                // STATE 1: INITIAL (Centered)
+                resultsSection.classList.add('hidden');
+                resultsSection.classList.remove('fade-in-up');
+                resultsSection.style.opacity = '0';
+                
+                resetContainer.classList.add('hidden');
+                resetContainer.classList.remove('opacity-100');
+                resetContainer.classList.add('opacity-0');
+                
+                mainGrid.classList.add('max-w-md', 'mx-auto', 'block');
+                mainGrid.classList.remove('max-w-4xl', 'grid', 'grid-cols-1', 'lg:grid-cols-12', 'gap-6', 'items-start');
+                inputCol.classList.remove('lg:col-span-5');
+                return;
+            } else {
+                // STATE 2: ACTIVE (Split)
+                mainGrid.classList.remove('max-w-md', 'mx-auto', 'block');
+                mainGrid.classList.add('max-w-4xl', 'grid', 'grid-cols-1', 'lg:grid-cols-12', 'gap-6', 'items-start');
+                inputCol.classList.add('lg:col-span-5');
+
+                resultsSection.classList.remove('hidden');
+                if (resultsSection.style.opacity === '0') {
+                    resultsSection.classList.add('fade-in-up');
+                    resultsSection.style.opacity = '1';
+                }
+
+                resetContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    resetContainer.classList.remove('opacity-0');
+                    resetContainer.classList.add('opacity-100');
+                }, 100);
+            }
+
+            if (!deadlineVal) return;
+
+            // Update Button States
+            updateButtonStates(deadlineVal);
+
+            const tokenValue = 15; 
+            const currencySymbol = '$';
+
+            // 1. Basic Calcs
+            const tokensNeeded = Math.ceil(costInput / tokenValue);
+            document.getElementById('inputTokensDisplay').innerText = tokensNeeded;
+            const totalGoldNeeded = tokensNeeded * tokenPrice;
+            
+            let missingGold = totalGoldNeeded - currentGold;
+            if (missingGold < 0) missingGold = 0;
+
+            let progress = 0;
+            if (totalGoldNeeded > 0) {
+                progress = (currentGold / totalGoldNeeded) * 100;
+                if (progress > 100) progress = 100;
+            }
+
+            // 2. Date Calcs
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const dateParts = deadlineVal.split('-');
+            const deadline = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]); 
+            const diffTime = deadline - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            let dailyStrict = 0;
+            if (diffDays > 0) {
+                dailyStrict = missingGold / diffDays;
+            } else if (missingGold > 0) {
+                dailyStrict = missingGold;
+            }
+
+            // 3. Auto-Sync Logic
+            if (!manualDaily) {
+                let autoValue = Math.ceil(dailyStrict);
+                
+                // Enforce minimum 15k floor (Efficiency Rule)
+                if (autoValue < 15000) {
+                    autoValue = 15000;
+                }
+
+                const inputEl = document.getElementById('dailyFarm');
+                inputEl.value = new Intl.NumberFormat('es-ES').format(autoValue);
+                document.getElementById('autoModeLabel').classList.remove('opacity-0');
+            }
+
+            // 4. Read Daily Farm & Determine Status
+            const dailyFarm = getCleanGold('dailyFarm');
+            let status = 'default';
+            
+            // Check efficiency for manual input warning
+            const effWarning = document.getElementById('efficiencyWarning');
+            if (manualDaily && dailyFarm > 0 && dailyFarm < 15000) {
+                effWarning.classList.remove('hidden');
+            } else {
+                effWarning.classList.add('hidden');
+            }
+
+            // --- STATUS LOGIC (Updated to switch from Neutral if gold entered) ---
+            if (missingGold <= 0) {
+                status = 'success'; // Done
+            } else if (manualDaily) {
+                // Manual override
+                if (dailyFarm < dailyStrict) {
+                    status = 'danger';
+                } else {
+                    status = 'success';
+                }
+            } else {
+                // AUTO MODE (Smart Toggle)
+                if (currentGold > 0) {
+                    // If user entered gold, switch to Green "On Track"
+                    status = 'success';
+                } else {
+                    // No gold entered -> Stay Neutral (Yellow)
+                    status = 'default';
+                }
+            }
+
+            // --- 6. Update UI Colors & Texts ---
+            setCardStatus('strictCard', 'strictIconBox', 'strictLabel', status);
+            setCardStatus('projectionCard', 'projectionIconBox', 'projectionLabel', status);
+
+            const dailyInput = document.getElementById('dailyFarm');
+            // Reset base classes
+            dailyInput.classList.remove('text-yellow-400', 'text-red-500', 'text-green-500');
+            
+            if (status === 'success') dailyInput.classList.add('text-green-500');
+            else if (status === 'danger') dailyInput.classList.add('text-red-500');
+            else dailyInput.classList.add('text-yellow-400'); // Default Yellow
+
+            const realDaysNeeded = dailyFarm > 0 ? Math.ceil(missingGold / dailyFarm) : 0;
+            const estimatedDate = new Date();
+            estimatedDate.setDate(now.getDate() + realDaysNeeded);
+
+            document.getElementById('totalGoldNeeded').innerText = formatNumber(totalGoldNeeded);
+            document.getElementById('tokensNeeded').innerText = tokensNeeded;
+            document.getElementById('missingGold').innerText = formatNumber(missingGold);
+            
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').innerText = `${Math.round(progress)}%`;
+            
+            if (progress >= 100) {
+                document.getElementById('progressBar').classList.add('bg-green-500');
+                document.getElementById('progressBar').classList.remove('from-blue-600', 'to-blue-400');
+            } else {
+                document.getElementById('progressBar').classList.remove('bg-green-500');
+                document.getElementById('progressBar').classList.add('from-blue-600', 'to-blue-400');
+            }
+
+            document.getElementById('dailyNeededStrict').innerText = formatNumber(dailyStrict);
+            document.getElementById('daysRemainingText').innerText = diffDays > 0 ? diffDays : 0;
+            document.getElementById('targetDateDisplay').innerText = `${dateParts[2]}/${dateParts[1]}`;
+
+            document.getElementById('realDaysNeeded').innerText = realDaysNeeded;
+            
+            let dateText = "Nunca";
+            if (realDaysNeeded <= 3650) {
+                dateText = estimatedDate.toLocaleDateString('es-ES', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+            
+            document.getElementById('estimatedDate').innerText = dateText;
+            document.getElementById('estimatedDate').className = "text-2xl font-bold transition-colors duration-300 text-white";
+
+            // --- NEW: Descriptive Text Logic (IMPOSING VISUALS) ---
+            const tipContainer = document.getElementById('tipContainer');
+            const tipIcon = document.getElementById('tipIcon');
+            const tipText = document.getElementById('tipText');
+
+            if (status === 'danger') {
+                // Negative / Danger Case (IMPOSING RED)
+                tipContainer.className = "bg-gradient-to-r from-red-900/50 to-red-900/10 border-l-4 border-red-500 shadow-lg shadow-red-900/30 rounded-r-lg p-6 flex gap-4 items-start transition-all duration-300";
+                tipIcon.className = "fas fa-exclamation-circle text-red-400 mt-1 text-2xl";
+                
+                // Calculate days late
+                const daysLate = realDaysNeeded - diffDays;
+                
+                tipText.innerHTML = `
+                    <div class="text-base text-gray-300">
+                        <strong class="text-red-300 text-lg block mb-1">Atención:</strong> 
+                        Llegarás a comprarlo el <strong class="text-white text-lg">${dateText}</strong> (${daysLate} días tarde) manteniendo el ritmo por <strong class="text-white text-lg">${realDaysNeeded}</strong> días de farmeo a <strong class="text-white text-lg">${formatNumber(dailyFarm)}</strong> oro diario.
+                    </div>
+                    <div class="mt-3 p-3 bg-red-950/40 rounded border border-red-900/30 text-sm text-gray-400">
+                        <i class="fas fa-hand-holding-dollar mr-1 text-red-400"></i> Sugerencia: Aumenta tu farm diario o compra lo restante con saldo de la tienda.
+                    </div>
+                `;
+                document.getElementById('estimatedDate').classList.add('text-white'); 
+            } else if (status === 'success') {
+                // Positive Case (IMPOSING GREEN)
+                tipContainer.className = "bg-gradient-to-r from-green-900/50 to-green-900/10 border-l-4 border-green-500 shadow-lg shadow-green-900/30 rounded-r-lg p-6 flex gap-4 items-start transition-all duration-300";
+                tipIcon.className = "fas fa-check-circle text-green-400 mt-1 text-2xl";
+                
+                if (missingGold <= 0) {
+                    tipText.innerHTML = `<strong class="text-green-300 text-lg">¡Felicidades!</strong> <div class="text-base mt-1">Ya tienes suficiente oro para comprar todo lo que necesitas.</div>`;
+                } else {
+                    tipText.innerHTML = `<strong class="text-green-300 text-lg block mb-1">¡Vas por buen camino!</strong> <div class="text-base text-gray-300">Llegarás a comprarlo el <strong class="text-white text-lg">${dateText}</strong> manteniendo el ritmo por <strong class="text-white text-lg">${realDaysNeeded}</strong> días de farmeo a <strong class="text-white text-lg">${formatNumber(dailyFarm)}</strong> oro diario.</div>`;
+                }
+            } else {
+                // Default / Neutral (Yellow) - (IMPOSING YELLOW)
+                tipContainer.className = "bg-gradient-to-r from-yellow-900/40 to-yellow-900/10 border-l-4 border-yellow-500 shadow-lg shadow-yellow-900/30 rounded-r-lg p-6 flex gap-4 items-start transition-all duration-300";
+                tipIcon.className = "fas fa-info-circle text-yellow-400 mt-1 text-2xl";
+                
+                tipText.innerHTML = `<strong class="text-yellow-400 text-lg block mb-1">Plan Ideal:</strong> <div class="text-base text-gray-300">Para lograr la meta, deberías farmear <strong class="text-white text-lg">${formatNumber(dailyFarm)}</strong> oro diario durante <strong class="text-white text-lg">${realDaysNeeded}</strong> días de farmeo.</div>`;
+            }
+        }
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html>
