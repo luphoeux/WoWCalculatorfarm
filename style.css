@@ -1,0 +1,57 @@
+/* ESTILOS CUSTOM (CSS PURO) */
+
+body {
+    background-color: #050505;
+    background-image: radial-gradient(circle at top, #1a1d26 0%, #050505 100%);
+}
+
+.input-wrapper {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.input-wrapper:focus-within {
+    transform: translateY(-1px);
+}
+
+.input-wrapper:focus-within i {
+    color: #fbbf24;
+}
+
+.input-wrapper:focus-within input {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 1px #fbbf2433;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0e1015;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a2e3b;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3f4455;
+}
+
+/* Pulse animation for Sync Button */
+@keyframes spin-once {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}
+.clicked-spin {
+    animation: spin-once 0.5s ease-out;
+}
+
+/* Fade in animation for results */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+    animation: fadeIn 0.5s ease-out forwards;
+}
