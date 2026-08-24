@@ -278,7 +278,14 @@
                             <div id="widgetCurrentPrice" class="text-xl font-bold text-white flex items-center justify-end gap-1.5">
                                 --- <img src="./public/images/money-gold.gif" alt="Gold" class="w-4 h-4 rounded-full">
                             </div>
-                            <div id="widgetPriceDiff" class="text-[10px] font-bold mt-0.5">---</div>
+                            <div class="relative group cursor-help flex items-center justify-end gap-1 mt-0.5 w-max ml-auto">
+                                <div id="widgetPriceDiff" class="text-[10px] font-bold">---</div>
+                                <i class="fas fa-info-circle text-[9px] text-gray-500 hover:text-gray-300 transition-colors"></i>
+                                <!-- Tooltip -->
+                                <div class="absolute right-0 top-full mt-2 hidden group-hover:block w-[200px] bg-gray-900 border border-gray-700 p-2 rounded shadow-xl z-50 pointer-events-none text-left text-[11px] font-normal text-gray-300 leading-tight">
+                                    Diferencia del precio en oro comparado con su valor exacto de hace 48 horas.
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
