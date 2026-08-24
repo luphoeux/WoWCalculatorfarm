@@ -1,0 +1,34 @@
+name: Update WoW Token Price
+
+on:
+  schedule:
+    - cron: '*/20 * * * *' # Ejecuta cada 20 minutos
+  workflow_dispatch: # Permite ejecución manual desde GitHub
+
+jobs:
+  update-price:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch new price
+        env:
+          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
+          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
+        run: node update_price.js
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add token_price.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update WoW Token Price [skip ci]" && git push)

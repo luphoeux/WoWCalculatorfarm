@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Evitar error 404 de favicon -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <title>Calculadora Farmers de Azeroth</title>
+
+    <!-- Meta Tags Básicas -->
+    <meta name="description" content="Calculadora avanzada para planificar tu economía en World of Warcraft. Calcula el oro diario necesario para pagar tu token o expansión.">
+    <meta name="keywords" content="wow, world of warcraft, token, oro, calculadora, economía, farming, gold farm">
+
+    <!-- OpenGraph (Discord, WhatsApp, Facebook) -->
+    <meta property="og:title" content="Calculadora Farmers de Azeroth">
+    <meta property="og:description" content="Planifica tu economía en World of Warcraft de manera precisa.">
+    <meta property="og:image" content="https://wow.zamimg.com/images/wow/icons/large/wow_token01.jpg">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Calculadora Farmers de Azeroth">
+    <meta name="twitter:description" content="Calculadora avanzada para planificar tu economía en World of Warcraft.">
+    <meta name="twitter:image" content="https://wow.zamimg.com/images/wow/icons/large/wow_token01.jpg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flatpickr for custom date picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wow: {
+                            dark: '#0e1015',
+                            card: '#15171e',
+                            border: '#2a2e3b',
+                            gold: '#fbbf24',
+                            rare: '#3b82f6',
+                            epic: '#a335ee',
+                            legendary: '#ff8000',
+                            danger: '#ef4444',
+                            success: '#22c55e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen text-gray-300 font-sans flex flex-col transition-all duration-700">
+    <main class="flex-grow w-full flex flex-col">
+        <div class="w-full flex flex-col items-center p-4 md:p-8">
+        <div class="mb-8 text-center transition-all duration-700" id="mainHeader">
+            <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
+                <img src="./public/images/channels4_profile.jpg"
+                    class="w-10 h-10 mr-2 rounded-full inline-block shadow-md" alt="Logo">Calculadora
+                <span class="text-wow-gold">Farmers de Azeroth</span>
+            </h1>
+            <p class="text-gray-500 text-sm">Planifica tu economía para lo que necesites.</p>
+        </div>
+
+        <div id="mainGrid" class="w-full max-w-4xl mx-auto flex flex-col lg:flex-row justify-center gap-6 transition-all duration-700 ease-in-out items-start">
+
+            <div id="inputCol" class="w-full max-w-[360px] mx-auto lg:mx-0 space-y-6 transition-all duration-700">
+
+                <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-lg">
+                <!-- Fin del Widget, movido a la derecha -->
+
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-4 border-b border-wow-border/50 pb-2">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                                <i class="fas fa-globe-americas"></i> Región
+                            </h2>
+                            <div class="flex gap-2 bg-[#0a0b10] p-1 rounded-lg border border-wow-border/50">
+                                <button id="btnRegionNA" class="px-3 py-1 text-xs font-bold rounded-md bg-blue-600/20 text-blue-400 border border-blue-500/30 transition-colors">NA</button>
+                                <button id="btnRegionEU" class="px-3 py-1 text-xs font-bold rounded-md text-gray-500 hover:text-gray-300 transition-colors">EU</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">COSTO EXPANSIÓN
+                                    (USD)</label>
+                                <div class="flex gap-2">
+                                    <div class="input-wrapper relative flex-grow">
+                                        <i
+                                            class="fas fa-dollar-sign absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
+                                        <input type="text" inputmode="decimal" id="usdCost"
+                                            class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-3 text-white font-medium focus:outline-none placeholder-gray-700"
+                                            value="90" placeholder="0" oninput="calculate()">
+                                    </div>
+                                    <div
+                                        class="w-20 flex-shrink-0 bg-[#0a0b10] border border-wow-border rounded-lg flex flex-col justify-center items-center shadow-inner">
+                                        <span id="inputTokensDisplay"
+                                            class="text-blue-400 font-bold text-lg leading-none mt-1">6</span>
+                                        <span class="text-[9px] text-gray-600 uppercase font-bold mb-0.5">Fichas</span>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-gray-500 mt-2 ml-1 flex items-start gap-1.5 leading-tight">
+                                    <i class="fas fa-info-circle mt-0.5 text-blue-500/50 flex-shrink-0"></i>
+                                    <span>
+                                        <strong>Nota:</strong> La ficha otorga $15 de saldo al canjearla por oro.
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div class="border-t border-wow-border"></div>
+
+                            <div>
+                                <div class="flex justify-between items-end mb-1.5 ml-1">
+                                    <label class="block text-xs font-semibold text-gray-500">PRECIO FICHA (ORO)</label>
+                                    <a href="https://wowauction.us/token" target="_blank"
+                                        class="text-[10px] text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                                        <span>Ver precio en WoWAuction</span>
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                                <div class="input-wrapper relative">
+                                    <input type="text" inputmode="decimal" id="tokenPrice"
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-3 pr-10 text-white font-medium text-right focus:outline-none placeholder-gray-600 transition-colors duration-300"
+                                        value="" placeholder="Ingresa el precio..." oninput="handleTokenInput(this)">
+                                    <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
+                                </div>
+                                <div id="lastUpdatedInfo" class="text-[9px] text-gray-500 mt-1.5 ml-1 flex items-center gap-1 opacity-80">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                    <span>Obteniendo precio automático...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-wow-border mb-6"></div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400"><i
+                                    class="fas fa-user-astronaut mr-2"></i>Tu Progreso</h2>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">ORO ACTUAL</label>
+                                <div class="input-wrapper relative">
+                                    <input type="text" inputmode="decimal" id="currentGold"
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-3 pr-10 text-white font-bold text-right focus:outline-none placeholder-gray-800 transition-colors duration-300"
+                                        placeholder="0" oninput="formatInput(this); calculate()">
+                                    <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
+                                </div>
+                            </div>
+
+                            <div id="dailyFarmContainer" class="hidden opacity-0 transition-all duration-700">
+                                <div class="flex justify-between items-end mb-1.5 ml-1">
+                                    <label class="block text-xs font-semibold text-gray-500">FARM DIARIO
+                                        PROMEDIO</label>
+                                    <span id="autoModeLabel"
+                                        class="text-[9px] text-blue-400 transition-opacity duration-300 flex items-center gap-1 opacity-0">
+                                        <i class="fas fa-robot"></i> Auto-ajustado
+                                    </span>
+                                </div>
+                                <div class="input-wrapper relative">
+                                    <input type="text" inputmode="decimal" id="dailyFarm"
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-10 text-yellow-400 font-bold text-right focus:outline-none placeholder-gray-800 transition-colors duration-300"
+                                        placeholder="0"
+                                        oninput="formatInput(this); handleDailyInput()">
+                                    <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
+
+                                    <button id="syncBtn"
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-300 hidden transition-colors group relative">
+                                        <i class="fas fa-sync-alt"></i>
+                                        <div class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none text-left">
+                                            Volver a calcular automáticamente (Mínimo 15k)
+                                        </div>
+                                    </button>
+                                </div>
+                                <div id="efficiencyWarning"
+                                    class="hidden mt-1.5 ml-1 text-[10px] text-gray-500 flex items-center gap-1.5 opacity-80">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                    <span>Consejo: El farm mínimo por hora es 15,000</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">FECHA
+                                    LÍMITE</label>
+                                <div class="input-wrapper relative">
+                                    <input type="text" id="deadlineDate"
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-3 pr-10 text-gray-300 focus:outline-none transition-colors duration-300 cursor-pointer"
+                                        value="2026-09-23">
+                                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                                </div>
+
+                                <div class="hidden flex-wrap gap-2 mt-2">
+                                    <button id="btnBrutosaurio"
+                                        class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
+                                        <i class="fas fa-dragon mr-1.5"></i>Brutosaurio
+                                        <div
+                                            class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
+                                            <div class="font-bold text-wow-gold mb-0.5">05 de Enero 2026</div>
+                                            Límite para comprar el Brutosaurio.
+                                        </div>
+                                    </button>
+
+                                    <button id="btnMidnight"
+                                        class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
+                                        <i class="fas fa-moon mr-1.5"></i>Midnight
+                                        <div
+                                            class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
+                                            <div class="font-bold text-purple-400 mb-0.5">02 de Marzo 2026</div>
+                                            Sale la expansión WoW Midnight.
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calculateBtnContainer" class="w-full mt-2">
+                        <button class="w-full bg-wow-gold hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-[0_0_15px_rgba(251,191,36,0.2)] hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all duration-300 flex items-center justify-center gap-2">
+                            Calcular
+                        </button>
+                    </div>
+                </div>
+
+                <div id="resetContainer"
+                    class="w-full text-center hidden pt-2 opacity-0 transition-opacity duration-500">
+                    <button
+                        class="text-xs text-gray-500 hover:text-gray-300 underline transition-colors focus:outline-none">
+                        <i class="fas fa-undo mr-1"></i> Restablecer
+                    </button>
+                </div>
+
+            </div>
+
+            <div id="rightCol" class="w-full max-w-[360px] mx-auto lg:mx-0 space-y-6 transition-all duration-700">
+                <!-- Widget de Historial (Sparkline) -->
+                <div class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="flex justify-between items-end mb-3 pb-2 border-b border-wow-border/50">
+                        <div class="relative group cursor-help w-max">
+                            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                                <img src="./public/images/wow_token.jpg" alt="WoW Token" class="w-6 h-6 rounded-full shadow-md">
+                                WoW Token <span id="widgetRegionBadge" class="text-[10px] bg-blue-600/30 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded uppercase">NA</span>
+                            </h2>
+                            <div class="text-[10px] text-gray-500 mt-1">Últimas 48 horas</div>
+                            
+                            <!-- Tooltip estilo WoWHead -->
+                            <div class="absolute left-0 top-full mt-2 hidden group-hover:flex items-start gap-1 z-50 pointer-events-none text-left w-max">
+                                <!-- Ícono flotante -->
+                                <div class="w-[42px] h-[42px] bg-black border border-[#5c5c5c] p-[2px] rounded-sm flex-shrink-0 shadow-lg mt-0.5">
+                                    <img src="./public/images/wow_token.jpg" class="w-full h-full object-cover rounded-[2px]">
+                                </div>
+                                <!-- Caja de descripción -->
+                                <div class="w-[270px] bg-[#070711] border border-[#5c5c5c] p-2.5 rounded-sm shadow-2xl">
+                                    <div class="text-[#00ccff] text-[15px] font-semibold leading-tight tracking-wide">Ficha de WoW</div>
+                                    <div class="text-[#ffd100] text-[13px] mt-1 leading-tight">Nivel de objeto 1</div>
+                                    <div class="text-white text-[13px] leading-tight mt-0.5">Se liga al recogerlo</div>
+                                    <div class="text-[#ffd100] text-[13px] mt-1 leading-tight">"Uso: Añade 30 días de tiempo de juego a tu cuenta de World of Warcraft."</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div id="widgetCurrentPrice" class="text-xl font-bold text-white flex items-center justify-end gap-1.5">
+                                --- <img src="./public/images/money-gold.gif" alt="Gold" class="w-4 h-4 rounded-full">
+                            </div>
+                            <div id="widgetPriceDiff" class="text-[10px] font-bold mt-0.5">---</div>
+                        </div>
+                    </div>
+                    
+                    <div id="sparklineContainer" class="w-full h-16 bg-[#0a0b10]/50 border border-wow-border/30 rounded-lg relative flex items-end mt-1 cursor-crosshair">
+                        <svg id="sparklineSvg" class="w-full h-full text-wow-gold rounded-lg" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <!-- El gráfico se inyecta por JS -->
+                        </svg>
+                        
+                        <!-- Elementos Interactivos (Ocultos por defecto) -->
+                        <div id="chartTooltip" class="absolute hidden bg-gray-900 border border-gray-700 text-xs rounded p-2 shadow-xl z-50 pointer-events-none w-max transition-opacity">
+                            <div class="font-bold text-white mb-0.5 flex items-center gap-1"><span id="ttPrice">---</span> <img src="./public/images/money-gold.gif" class="w-3 h-3"></div>
+                            <div class="text-[9px] text-gray-400 uppercase tracking-wider font-semibold" id="ttDate">---</div>
+                        </div>
+                        <div id="chartHoverDot" class="absolute hidden w-2 h-2 bg-white rounded-full shadow-[0_0_5px_#fff] transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                    </div>
+
+                    <div class="mt-3 flex justify-between items-center text-xs">
+                        <div class="flex flex-col">
+                            <span class="text-gray-500 font-semibold mb-0.5">Mínimo registrado (Últimas 48h)</span>
+                            <span id="widgetLowPrice" class="text-gray-300 font-bold flex items-center gap-1">--- <img src="./public/images/money-gold.gif" class="w-3 h-3"></span>
+                        </div>
+                        <div class="flex flex-col text-right">
+                            <span class="text-gray-500 font-semibold mb-0.5">Máximo</span>
+                            <span id="widgetHighPrice" class="text-gray-300 font-bold flex items-center justify-end gap-1">--- <img src="./public/images/money-gold.gif" class="w-3 h-3"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN del Widget de Historial -->
+
+                <!-- Inicio de la Sección de Resultados -->
+                <div id="resultsSection" class="w-full space-y-4 hidden opacity-0 transition-opacity duration-700">
+
+                    <div class="bg-wow-card border border-wow-border rounded-xl p-4 shadow-lg relative overflow-hidden">
+
+                        <div class="flex flex-col gap-4 relative z-10">
+                        <div>
+                            <div class="text-gray-500 text-xs uppercase font-bold mb-1">Costo Total</div>
+                            <div class="text-2xl font-bold text-white flex items-baseline gap-2">
+                                <span id="totalGoldNeeded">0</span>
+                                <img src="./public/images/money-gold.gif" alt="Gold"
+                                    class="w-4 h-4 rounded-full mt-1.5 shadow-sm">
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Equivale a <span id="tokensNeeded"
+                                    class="text-blue-400 font-bold">0</span> Fichas</div>
+                        </div>
+                        <div class="pt-4 border-t border-wow-border/50">
+                            <div class="text-gray-500 text-xs uppercase font-bold mb-1">Oro Faltante</div>
+                            <div class="text-2xl font-bold text-wow-danger flex items-baseline gap-2">
+                                <span id="missingGold">0</span>
+                                <img src="./public/images/money-gold.gif" alt="Gold"
+                                    class="w-4 h-4 rounded-full mt-1.5 shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 relative z-10">
+                        <div class="flex justify-between text-xs mb-1.5 text-gray-400">
+                            <span>Progreso Actual</span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div class="w-full bg-[#0a0b10] rounded-full h-2.5 overflow-hidden">
+                            <div id="progressBar"
+                                class="bg-gradient-to-r from-blue-600 to-blue-400 h-2.5 rounded-full transition-all duration-500"
+                                style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden flex-col gap-4">
+
+                    <div id="strictCard"
+                        class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-lg flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <div id="strictIconBox"
+                                    class="p-1.5 bg-gray-800/50 rounded text-gray-400">
+                                    <i class="fas fa-hourglass-half text-sm"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-200 text-sm">Meta Estricta</h3>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4">Para llegar exactamente el <span
+                                    id="targetDateDisplay" class="text-gray-300">...</span></p>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-gray-400 font-medium mb-1" id="strictLabel">Oro diario necesario
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="dailyNeededStrict">0</div>
+
+                            <div class="mt-3 pt-3 border-t border-wow-border text-xs text-gray-500 text-left">
+                                <span id="daysRemainingText">0</span> días restantes
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="projectionCard"
+                        class="bg-wow-card border border-wow-border rounded-xl p-5 shadow-lg flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <div id="projectionIconBox"
+                                    class="p-1.5 bg-gray-800/50 rounded text-gray-400">
+                                    <i class="fas fa-calendar-check text-sm"></i>
+                                </div>
+                                <h3 class="font-bold text-gray-200 text-sm">Proyección Real</h3>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4">Basado en tu farm actual</p>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-gray-400 font-medium mb-1" id="projectionLabel">Fecha estimada de
+                                compra</div>
+                            <div class="text-3xl font-bold text-white" id="estimatedDate">--/--/--</div>
+
+                            <div class="mt-3 pt-3 border-t border-wow-border flex justify-between items-center">
+                                <div class="text-xs text-gray-500">
+                                    <span id="realDaysNeeded" class="text-gray-300 font-bold">0</span> días de farmeo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tipContainer"
+                    class="bg-gradient-to-r from-blue-900/40 to-blue-900/10 border-l-4 border-blue-500 shadow-lg shadow-blue-900/20 rounded-r-lg p-4 flex gap-4 items-start transition-all duration-300">
+                    <div class="text-sm text-gray-300 leading-relaxed w-full" id="tipText">
+                    </div>
+                </div>
+                <!-- Fin de la Sección de Resultados -->
+            </div>
+            
+        </div>
+    </main>
+
+    <footer class="w-full mt-auto border-t border-wow-border/30 bg-[#0e1015]/80 backdrop-blur-md py-6">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <!-- Socials & Copyright -->
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex gap-4">
+                    <a href="https://www.facebook.com/Dantaesgameplay" target="_blank"
+                        class="text-gray-500 hover:text-[#1877F2] transition-colors"><i
+                            class="fab fa-facebook text-lg"></i></a>
+                    <a href="https://discord.com/invite/PGXFGGZffM" target="_blank"
+                        class="text-gray-500 hover:text-[#5865F2] transition-colors"><i
+                            class="fab fa-discord text-lg"></i></a>
+                    <a href="https://www.twitch.tv/dantaess" target="_blank"
+                        class="text-gray-500 hover:text-[#9146FF] transition-colors"><i
+                            class="fab fa-twitch text-lg"></i></a>
+                    <a href="https://www.youtube.com/@dantaes" target="_blank"
+                        class="text-gray-500 hover:text-[#FF0000] transition-colors"><i
+                            class="fab fa-youtube text-lg"></i></a>
+                </div>
+
+            </div>
+
+            <!-- Recommended Farms (Horizontal) -->
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <span class="text-[10px] font-bold text-wow-gold uppercase hidden md:block">Farms recomendados:</span>
+
+                <a href="https://www.youtube.com/watch?v=xmg9xTmWxfQ&list=PLvrGkNR0W2zgjCMEdy4DoKdxkL32Q_Mg_"
+                    target="_blank"
+                    class="group flex items-center gap-2 bg-[#15171e] border border-wow-border rounded px-2 py-1.5 hover:border-purple-500/50 transition-all">
+                    <span class="text-[10px] font-bold text-gray-400 group-hover:text-white">WoW Midnight</span>
+                </a>
+
+                <a href="https://www.youtube.com/watch?v=YRbDZ5bhILQ&list=PLvrGkNR0W2zjDExnjAoEAV1UNvRc4sUL-"
+                    target="_blank"
+                    class="group flex items-center gap-2 bg-[#15171e] border border-wow-border rounded px-2 py-1.5 hover:border-blue-500/50 transition-all">
+                    <span class="text-[10px] font-bold text-gray-400 group-hover:text-white">WoW The War Within</span>
+                </a>
+
+                <a href="https://www.youtube.com/watch?v=LCvEvGGrv_Q&list=PLvrGkNR0W2ziL11kh7T7xgMEq6xuDR7ic"
+                    target="_blank"
+                    class="group flex items-center gap-2 bg-[#15171e] border border-wow-border rounded px-2 py-1.5 hover:border-yellow-500/50 transition-all">
+                    <span class="text-[10px] font-bold text-gray-400 group-hover:text-white">Guía Oro desde cero</span>
+                </a>
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
