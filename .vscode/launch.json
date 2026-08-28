@@ -4,15 +4,22 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Abrir index2.html en Chrome",
-            "url": "file://${workspaceFolder}/index2.html",
+            "name": "Abrir index.html en Chrome",
+            "url": "file://${workspaceFolder}/index.html",
             "webRoot": "${workspaceFolder}"
         },
         {
             "type": "chrome",
             "request": "launch",
             "name": "Live Server (Chrome)",
-            "url": "http://localhost:5500/index2.html",
+            "url": "http://localhost:5500/index.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Localhost 8080 (Chrome)",
+            "url": "http://localhost:8080/",
             "webRoot": "${workspaceFolder}"
         }
     ]

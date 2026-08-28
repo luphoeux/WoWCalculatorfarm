@@ -112,6 +112,33 @@ async function main() {
 
         fs.writeFileSync('token_price.json', JSON.stringify(data, null, 2));
         console.log(`Successfully updated token prices: NA=${priceNA}, EU=${priceEU}`);
+
+        // 5. Save to Google Sheets
+        const sheetsUrl = process.env.GOOGLE_SHEETS_URL;
+        if (sheetsUrl) {
+            try {
+                const sheetResponse = await fetch(sheetsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        timestamp: lastUpdatedDate.toISOString(),
+                        priceNA: priceNA,
+                        priceEU: priceEU
+                    })
+                });
+                
+                if (sheetResponse.ok) {
+                    console.log('Successfully sent data to Google Sheets.');
+                } else {
+                    console.warn(`Failed to send data to Google Sheets: ${sheetResponse.statusText}`);
+                }
+            } catch (sheetError) {
+                console.error('Error sending data to Google Sheets:', sheetError);
+            }
+        } else {
+            console.log('GOOGLE_SHEETS_URL no está configurado. Saltando envío a Sheets.');
+        }
+
     } catch (error) {
         console.error('Error updating price:', error);
         process.exit(1);
