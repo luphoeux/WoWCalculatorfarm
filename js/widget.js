@@ -46,7 +46,7 @@ export function renderWidget() {
             });
             
             svg.innerHTML = `
-                <path d="${pathD}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path d="${pathD}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
             `;
             
             const container = document.getElementById('sparklineContainer');
