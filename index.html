@@ -65,16 +65,48 @@
 </head>
 
 <body class="min-h-screen text-gray-300 font-sans flex flex-col transition-all duration-700">
-    <main class="flex-grow w-full flex flex-col">
+    <main class="flex-grow w-full flex flex-col relative">
         <div class="w-full flex flex-col items-center p-4 md:p-8">
-        <div class="mb-8 text-center transition-all duration-700" id="mainHeader">
-            <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
-                <img src="./public/images/channels4_profile.jpg"
-                    class="w-10 h-10 mr-2 rounded-full inline-block shadow-md" alt="Logo">Calculadora
-                <span class="text-wow-gold">Farmers de Azeroth</span>
-            </h1>
-            <p class="text-gray-500 text-sm">Planifica tu economía para lo que necesites.</p>
+        
+        <!-- Onboarding Step -->
+        <div id="onboardingStep" class="w-full max-w-md mx-auto flex flex-col items-center justify-center min-h-[60vh] transition-all duration-700">
+            <div class="mb-8 text-center">
+                <img src="./public/images/channels4_profile.jpg" class="w-20 h-20 mx-auto mb-4 rounded-full shadow-lg border-2 border-wow-gold" alt="Logo">
+                <h1 class="text-3xl font-bold text-white tracking-tight mb-2">¡Bienvenido!</h1>
+                <p class="text-gray-400 text-sm">Para empezar a planificar, necesitamos un dato.</p>
+            </div>
+            
+            <div class="w-full bg-wow-card border border-wow-border rounded-xl p-6 shadow-xl text-center">
+                <label class="block text-sm font-bold text-gray-300 mb-4 uppercase tracking-wider">¿Cuánto oro tienes actualmente?</label>
+                
+                <div class="input-wrapper relative w-full mb-6 max-w-xs mx-auto">
+                    <input type="text" inputmode="decimal" id="initialGold"
+                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-3 pl-4 pr-10 text-white font-bold text-xl text-center focus:outline-none focus:border-wow-gold transition-colors duration-300"
+                        placeholder="0">
+                    <img src="./public/images/money-gold.gif" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" alt="Gold">
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <button id="btnStartCalc" class="w-full bg-wow-gold hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-[0_0_15px_rgba(251,191,36,0.2)] hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all duration-300">
+                        Comenzar
+                    </button>
+                    <button id="btnSkipOnboarding" class="text-xs font-bold text-gray-500 hover:text-gray-300 transition-colors uppercase tracking-wider py-2">
+                        Omitir este paso
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <!-- Main App Content -->
+        <div id="mainAppContent" class="w-full hidden opacity-0 transition-opacity duration-700 flex-col items-center">
+            <div class="mb-8 text-center transition-all duration-700 w-full" id="mainHeader">
+                <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-2">
+                    <img src="./public/images/channels4_profile.jpg"
+                        class="w-10 h-10 mr-2 rounded-full inline-block shadow-md" alt="Logo">Calculadora
+                    <span class="text-wow-gold">Farmers de Azeroth</span>
+                </h1>
+                <p class="text-gray-500 text-sm">Planifica tu economía para lo que necesites.</p>
+            </div>
 
         <div id="mainGrid" class="w-full max-w-4xl mx-auto flex flex-col lg:flex-row justify-center gap-6 transition-all duration-700 ease-in-out items-start">
 
@@ -94,22 +126,21 @@
                             </div>
                         </div>
 
-                        <div class="space-y-4">
+                        <div class="space-y-4" id="usdModeInputs">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1">COSTO EXPANSIÓN
-                                    (USD)</label>
+                                <label class="block text-[10px] sm:text-xs font-semibold text-gray-500 mb-1.5 ml-1">COSTO BRUTOSAURIO EDICIÓN ANIVERSARIO</label>
                                 <div class="flex gap-2">
                                     <div class="input-wrapper relative flex-grow">
                                         <i
                                             class="fas fa-dollar-sign absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 transition-colors"></i>
                                         <input type="text" inputmode="decimal" id="usdCost"
                                             class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-10 pr-3 text-white font-medium focus:outline-none placeholder-gray-700"
-                                            value="90" placeholder="0" oninput="calculate()">
+                                            value="15" placeholder="0" oninput="calculate()">
                                     </div>
                                     <div
                                         class="w-20 flex-shrink-0 bg-[#0a0b10] border border-wow-border rounded-lg flex flex-col justify-center items-center shadow-inner">
                                         <span id="inputTokensDisplay"
-                                            class="text-blue-400 font-bold text-lg leading-none mt-1">6</span>
+                                            class="text-blue-400 font-bold text-lg leading-none mt-1">1</span>
                                         <span class="text-[9px] text-gray-600 uppercase font-bold mb-0.5">Fichas</span>
                                     </div>
                                 </div>
@@ -134,8 +165,8 @@
                                 </div>
                                 <div class="input-wrapper relative">
                                     <input type="text" inputmode="decimal" id="tokenPrice"
-                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-3 pr-10 text-white font-medium text-right focus:outline-none placeholder-gray-600 transition-colors duration-300"
-                                        value="" placeholder="Ingresa el precio..." oninput="handleTokenInput(this)">
+                                        class="w-full bg-[#0a0b10] border border-wow-border rounded-lg py-2.5 pl-3 pr-10 text-white font-medium text-right focus:outline-none placeholder-gray-600 transition-colors duration-300 opacity-60 cursor-not-allowed"
+                                        value="" placeholder="Cargando precio..." readonly>
                                     <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
                                 </div>
                                 <div id="lastUpdatedInfo" class="text-[9px] text-gray-500 mt-1.5 ml-1 flex items-center gap-1 opacity-80">
@@ -164,8 +195,7 @@
                                     <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
                                 </div>
                             </div>
-
-                            <div id="dailyFarmContainer" class="hidden opacity-0 transition-all duration-700">
+                            <div id="dailyFarmContainer" class="transition-all duration-700">
                                 <div class="flex justify-between items-end mb-1.5 ml-1">
                                     <label class="block text-xs font-semibold text-gray-500">FARM DIARIO
                                         PROMEDIO</label>
@@ -182,7 +212,7 @@
                                     <img src="./public/images/money-gold.gif" class="absolute right-3 top-1/2 -translate-y-1/2 w-[14px] h-[14px]" alt="Gold">
 
                                     <button id="syncBtn"
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-300 hidden transition-colors group relative">
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-300 hidden transition-colors group">
                                         <i class="fas fa-sync-alt"></i>
                                         <div class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none text-left">
                                             Volver a calcular automáticamente (Mínimo 15k)
@@ -205,28 +235,6 @@
                                         value="2026-09-23">
                                     <i class="fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                                 </div>
-
-                                <div class="hidden flex-wrap gap-2 mt-2">
-                                    <button id="btnBrutosaurio"
-                                        class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
-                                        <i class="fas fa-dragon mr-1.5"></i>Brutosaurio
-                                        <div
-                                            class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
-                                            <div class="font-bold text-wow-gold mb-0.5">05 de Enero 2026</div>
-                                            Límite para comprar el Brutosaurio.
-                                        </div>
-                                    </button>
-
-                                    <button id="btnMidnight"
-                                        class="group relative text-[10px] px-2.5 py-1.5 rounded transition-all duration-300 flex items-center border">
-                                        <i class="fas fa-moon mr-1.5"></i>Midnight
-                                        <div
-                                            class="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-xs text-gray-300 hidden group-hover:block z-50 pointer-events-none">
-                                            <div class="font-bold text-purple-400 mb-0.5">02 de Marzo 2026</div>
-                                            Sale la expansión WoW Midnight.
-                                        </div>
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -234,6 +242,23 @@
                     <div id="calculateBtnContainer" class="w-full mt-2">
                         <button class="w-full bg-wow-gold hover:bg-yellow-400 text-black font-bold py-3 rounded-lg shadow-[0_0_15px_rgba(251,191,36,0.2)] hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all duration-300 flex items-center justify-center gap-2">
                             Calcular
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-6 pt-4 border-t border-wow-border/50" id="modeTabs">
+                        <button id="btnTab7M" class="group relative flex-1 px-2 py-2 rounded-lg transition-all duration-300 flex items-center justify-center border font-bold text-[10px] sm:text-xs bg-[#2a220e] border-yellow-900/30 text-yellow-500/60 hover:text-yellow-500 hover:border-yellow-900/60">
+                            Brutosaurio (7M <img src="./public/images/money-gold.gif" class="w-3 h-3 ml-1 inline">)
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-[10px] text-gray-300 hidden group-hover:block z-50 pointer-events-none text-center font-normal leading-tight">
+                                <div class="font-bold text-yellow-400 mb-0.5">6 de Octubre 2026</div>
+                                Posible fecha de salida del parche.
+                            </div>
+                        </button>
+                        <button id="btnTab90USD" class="group relative flex-1 px-2 py-2 rounded-lg transition-all duration-300 flex items-center justify-center border font-bold text-[10px] sm:text-xs bg-[#181226] border-purple-900/30 text-purple-400/60 hover:text-purple-400 hover:border-purple-900/60">
+                            Bruto Aniv. (90USD)
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 border border-gray-700 rounded shadow-xl text-[10px] text-gray-300 hidden group-hover:block z-50 pointer-events-none text-center font-normal leading-tight">
+                                <div class="font-bold text-purple-400 mb-0.5">17 de Noviembre 2026</div>
+                                Fecha estimada que posiblemente saldrá este brutosaurio.
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -416,7 +441,9 @@
                 <!-- Fin de la Sección de Resultados -->
             </div>
             
-        </div>
+        </div> <!-- End mainGrid -->
+        </div> <!-- End mainAppContent -->
+        </div> <!-- End p-4 md:p-8 -->
     </main>
 
     <footer class="w-full mt-auto border-t border-wow-border/30 bg-[#0e1015]/80 backdrop-blur-md py-6">

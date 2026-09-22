@@ -47,30 +47,6 @@ export function checkDailyFarmValue() {
     }
 }
 
-export function updateButtonStates(currentDate) {
-    const btnBruto = document.getElementById('btnBrutosaurio');
-    const btnMid = document.getElementById('btnMidnight');
-
-    const brutoActive = ['bg-yellow-900/40', 'border-yellow-500', 'text-yellow-200', 'shadow-[0_0_10px_rgba(234,179,8,0.2)]'];
-    const brutoInactive = ['bg-[#2a220e]', 'border-yellow-900/30', 'text-wow-gold/60', 'hover:text-wow-gold', 'hover:border-yellow-900/60'];
-
-    const midActive = ['bg-purple-900/40', 'border-purple-500', 'text-purple-200', 'shadow-[0_0_10px_rgba(168,85,247,0.2)]'];
-    const midInactive = ['bg-[#181226]', 'border-purple-900/30', 'text-purple-400/60', 'hover:text-purple-400', 'hover:border-purple-900/60'];
-
-    btnBruto.classList.remove(...brutoActive, ...brutoInactive);
-    btnMid.classList.remove(...midActive, ...midInactive);
-
-    if (currentDate === CONSTANTS.DATE_BRUTO) {
-        btnBruto.classList.add(...brutoActive);
-        btnMid.classList.add(...midInactive);
-    } else if (currentDate === CONSTANTS.DATE_MIDNIGHT) {
-        btnBruto.classList.add(...brutoInactive);
-        btnMid.classList.add(...midActive);
-    } else {
-        btnBruto.classList.add(...brutoInactive);
-        btnMid.classList.add(...midInactive);
-    }
-}
 
 export function updateFinalTip(status, dateText, diffDays, dailyFarm, missingGold, realDaysNeeded) {
     const tipContainer = document.getElementById('tipContainer');

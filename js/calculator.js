@@ -1,5 +1,5 @@
 import { state, CONSTANTS } from './state.js';
-import { formatNumber, animateNumber, animateMoneyIcon, updateButtonStates, updateFinalTip } from './ui.js';
+import { formatNumber, animateNumber, animateMoneyIcon, updateFinalTip } from './ui.js';
 
 export function calculate() {
     state.hasCalculated = true;
@@ -22,9 +22,22 @@ export function calculate() {
     const deadlineDate = new Date(deadlineDateStr);
     
     // --- 2. CÁLCULO DE COSTO TOTAL ---
+    let totalGoldNeeded = 0;
+    let tokensNeeded = 0;
     const tokenValueUSD = 15;
-    const tokensNeeded = Math.ceil(expansionCostUSD / tokenValueUSD);
-    const totalGoldNeeded = tokensNeeded * tokenPriceGold;
+    
+    if (state.currentTab === 'bruto-7m') {
+        totalGoldNeeded = 7000000;
+        tokensNeeded = 0;
+        document.getElementById('tokensNeeded').parentElement.classList.add('hidden');
+    } else {
+        const costToUse = expansionCostUSD > 0 ? expansionCostUSD : 90;
+        tokensNeeded = Math.ceil(costToUse / tokenValueUSD);
+        totalGoldNeeded = tokensNeeded * tokenPriceGold;
+        document.getElementById('tokensNeeded').parentElement.classList.remove('hidden');
+    }
+
+    document.getElementById('inputTokensDisplay').innerText = tokensNeeded;
     
     // --- 3. CÁLCULO DE ORO FALTANTE ---
     let missingGold = totalGoldNeeded - currentGold;
@@ -93,7 +106,6 @@ export function calculate() {
     animateMoneyIcon(totalGoldEl.parentElement.querySelector('img'));
     animateMoneyIcon(missingGoldEl.parentElement.querySelector('img'));
     
-    updateButtonStates(deadlineDateStr);
     
     // Determinación de Estado
     let status = 'neutral'; 
